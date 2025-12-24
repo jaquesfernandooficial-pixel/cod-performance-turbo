@@ -1,3 +1,4 @@
+
 name: Build APK
 on: [push]
 jobs:
@@ -5,9 +6,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build with Buildozer
-        uses: ArtemSerebriakov/buildozer-action@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          buildozer_version: stable
-          python_version: 3.9
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential libffi-dev python3-dev libtool zip unzip autoconf automake
+          pip install --upgrade pip
+          pip install buildozer cython kivy
+      - name: Build with Buildozer
+        run: |
+          yes | buildozer android debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: Performance-App
+          path: bin/*.apk
           
